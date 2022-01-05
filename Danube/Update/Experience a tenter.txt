@@ -1,0 +1,5 @@
+Dans le cas pour lequel on a fait des suppositions sur le modèle dynamique, on peut imposer phi(x) > a de telle sorte qu'on ne puisse se retrouver avec des bornes inférieures de débit négatives
+On peut également supprimer le calcul de la covariance qui est annexe au problème et périphérique pour la démarche
+Il faut impérativement tenter notre approche en situation théorique pour un modèle comme le Lorenz
+Le mu est toujours négatif lors des premiers jours de reconstruction. Comment cela se fait-il? Comment y remédier?
+Evaluation par des coûts statistiques
