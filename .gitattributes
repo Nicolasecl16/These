@@ -5,6 +5,8 @@
 *.txt filter=lfs diff=lfs merge=lfs -text
 *.html filter=lfs diff=lfs merge=lfs -text
 *.md filter=lfs diff=lfs merge=lfs -text
+*.ckpt filter=lfs diff=lfs merge=lfs -text
+*.nc filter=lfs diff=lfs merge=lfs -text
 *.md !text !filter !merge !diff
 *.ckpt !text !filter !merge !diff
 *.ipynb !text !filter !merge !diff
