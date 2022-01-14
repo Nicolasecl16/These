@@ -338,7 +338,7 @@ if flagInit == 0:
         
 elif flagInit == 2 :
     if flagTypeMissData == 1:
-        ncfile = Dataset('lightning_logs/version_17/Input_model_sum-Exp2-epoch=598-val_loss=-1.59.nc')
+        ncfile = Dataset('Results/modelsum-Exp2-epoch=598-val_loss=-1-Copy1.59.nc')
         X_init= np.zeros((1000,10,30,2))
         mu = ncfile['mean_pred']
         cov = ncfile['cov_pred']
