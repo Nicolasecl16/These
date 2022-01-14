@@ -335,59 +335,37 @@ if flagInit == 0:
             
         
         
+        
 elif flagInit == 2 :
     if flagTypeMissData == 1:
-        ckpt_path ='Res_Update/modelsum-Exp2-epoch=243-val_loss=-7.84.ckpt'
-        lit_cls = LitModel
-        mod = lit_cls.load_from_checkpoint(ckpt_path, 
-                                                    mean_Tr=0, 
-                                                    std_Tr = 0
-                                                    )
-        mod=mod.to(device)
-    
-        Cov_known_Init = 1
-        Cov_unknown_Init = 1
+        ncfile = Dataset('lightning_logs/version_17/Input_model_sum-Exp2-epoch=598-val_loss=-1.59.nc')
+        X_init= np.zeros((1000,10,30,2))
+        mu = ncfile['mean_pred']
+        cov = ncfile['cov_pred']
+        init = ncfile['inits']
+        target = ncfile['targets']
+        print(mu.shape)
+        print(type(mu))
         
-        X_train_InitD = torch.zeros(int(0.6*N),DT,DX,2)
-        X_train_InitD[:,:,:,1] = torch.ones(int(0.6*N),DT,DX)
-        X_train_InitD[:,:int(frac_prev*DT+1),:,1] =Cov_known_Init
-        X_train_InitD[:,int(frac_prev*DT+1):,:,1] =Cov_unknown_Init
-        X_val_InitD = torch.zeros(int(0.2*N),DT,DX,2)
-        X_val_InitD[:,:,:,1] =torch.ones(int(0.2*N),DT,DX)
-        X_val_InitD[:,:int(frac_prev*DT+1),:,1] =Cov_known_Init
-        X_val_InitD[:,int(frac_prev*DT+1):,:,1] =Cov_unknown_Init
-        X_test_InitD = torch.zeros(int(0.2*N),DT,DX,2)
-        X_test_InitD[:,:,:,1] =torch.ones(int(0.2*N),DT,DX)
-        X_test_InitD[:,:int(frac_prev*DT+1),:,1] =Cov_known_Init
-        X_test_InitD[:,int(frac_prev*DT+1):,:,1] =Cov_unknown_Init
-        X_train_InitD[:,:,:,0] = X_train_obsD
-        XInitD = X_train_InitD[:,int(frac_prev*DT),:,0]
-        for i in range(int(frac_prev*DT)+1,DT):
-            X_train_InitD[:,i,:,0] = XInitD
-            
-        X_val_InitD[:,:,:,0] = X_val_obsD
-        XInitD = X_val_InitD[:,int(frac_prev*DT),:,0]
-        for i in range(int(frac_prev*DT)+1,DT):
-            X_val_InitD[:,i,:,0] = XInitD
+        X_true = target
+        X_trainD = X_true[:int(0.6*N),:,:]
+        X_valD = X_true[int(0.6*N):int(0.8*N),:,:]
+        X_testD = X_true[int(0.8*N):,:,:]
         
-        X_test_InitD[:,:,:,0] = X_test_obsD
-        XInitD = X_test_InitD[:,int(frac_prev*DT),:,0]
-        for i in range(int(frac_prev*DT)+1,DT):
-            X_test_InitD[:,i,:,0] = XInitD
-        X_train_InitD.requires_grad =True
-        X_train_InitD = X_train_InitD
-        X_val_InitD.requires_grad =True
-        X_test_InitD.requires_grad =True
-        X_train_InitD = mod.model(X_train_InitD.to(device),X_train_obsD.to(device),mask_trainD.to(device))[0]
-        X_val_InitD = mod.model(X_val_InitD.to(device), X_val_obsD.to(device),mask_valD.to(device))[0]
-        X_test_InitD = mod.model(X_test_InitD.to(device),X_test_obsD.to(device),mask_testD.to(device))[0]
-        X_train_InitD[:,:,:,1] = torch.abs(X_train_InitD[:,:,:,1])
-        X_val_InitD[:,:,:,1] = torch.abs(X_val_InitD[:,:,:,1])
-        X_test_InitD[:,:,:,1] = torch.abs(X_test_InitD[:,:,:,1]) 
-        X_train_InitD = X_train_InitD.detach().cpu()
-        X_val_InitD = X_val_InitD.detach().cpu()
-        X_test_InitD = X_test_InitD.detach().cpu()
-           
+        X_train_obsD = init[:int(0.6*N),:,:]
+        X_val_obsD = init[int(0.6*N):int(0.8*N),:,:]
+        X_test_obsD = init[int(0.8*N):,:,:]
+        X_train_obsD[:,(int(frac_prev*DT+1)):,:]=0
+        X_val_obsD[:,(int(frac_prev*DT+1)):,:] = 0
+        X_test_obsD[:,(int(frac_prev*DT+1)):,:] = 0
+        
+        X_init[:,:,:,0] = mu[:,:,:]
+        X_init[:,:,:,1] = np.abs(cov[:,:,:])
+        
+        X_train_InitD = X_init[:int(0.6*N),:,:,:]
+        X_val_InitD = X_init[int(0.6*N):int(0.8*N),:,:,:]
+        X_test_InitD = X_init[int(0.8*N):,:,:,:]
+        
 #x_train_InitD = torch.zeros(X_train_InitD.shape[0],DT,DX,2)
 #x_val_InitD = torch.zeros(X_val_InitD.shape[0],DT,DX,2)
 #x_test_InitD = torch.zeros(X_test_InitD.shape[0],DT,DX,2) 

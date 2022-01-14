@@ -421,11 +421,19 @@ class LitModel(pl.LightningModule):
             outputs, hidden_new, cell_new, normgrad = self.model(inputs_init, inputs_missing, masks)
             new_target = torch.zeros(outputs.shape)
             new_target[:,:,:,0] = targets_GT
-            new_target[:,:,:,1] = outputs[:,:,:,1]
+            #modif1
+            new_target[:,:,:,1] = torch.abs(outputs[:,:,:,1])
             new_target=new_target.to(device)
+            #modif2
+            out = torch.zeros(outputs.shape)
+            out[:,:,:,0]=outputs[:,:,:,0]
+            out[:,:,:,1]= torch.abs(outputs[:,:,:,1])
+            out=out.to(device)
+            
             
             if (phase == 'val') or (phase == 'test'):
                 outputs = outputs.detach()
+                out =out.detach()
                      
             loss_R      = torch.sum(((outputs[:,:,:,0] - targets_GT)*torch.abs(outputs[:,:,:,1])*100)**2-2*torch.log(torch.abs(outputs[:,:,:,1])*100)* masks )
             loss_R      = torch.mul(1.0 / torch.sum(masks),loss_R)
@@ -434,32 +442,36 @@ class LitModel(pl.LightningModule):
             loss_I      = torch.mul(1.0 / torch.sum(1.-masks),loss_I)
             
             loss_All    = loss_I+loss_R 
-            
-            loss_AE     = torch.mean((self.model.phi_r(outputs) - outputs)**2 )
-            loss_AE_GT  = torch.mean((self.model.phi_r(new_target) - new_target)**2 )
+            #loss_AE_cov =  torch.mean((self.model.phi_r(out) - outputs)**2 )
+            loss_AE_mu     = torch.mean((self.model.phi_r(out)[:,:,:,0] - out[:,:,:,0])**2 )
+            loss_AE_GT_mu  = torch.mean((self.model.phi_r(new_target)[:,:,:,0] - new_target[:,:,:,0])**2 )
+            loss_AE_cov     = torch.mean((self.model.phi_r(out)[:,:,:,1] - out[:,:,:,1])**2 )
+            loss_AE_GT_cov = torch.mean((self.model.phi_r(new_target)[:,:,:,1] - new_target[:,:,:,1])**2 )
             
             loss_squared = torch.mean((outputs[:,:,:,0] - targets_GT)**2)
             
             # total loss
-            loss        = 0.1 * self.hparams.alpha[0] * loss_All + 0.5 * self.hparams.alpha[1] * ( loss_AE + loss_AE_GT )+0.5*loss_squared
+            loss        = 0.1 * self.hparams.alpha[0] * loss_All + 0.5 * self.hparams.alpha[1] * ( loss_AE_mu + loss_AE_GT_mu )+0.5*loss_squared+0.01*(loss_AE_cov+loss_AE_GT_cov)
             
-            # Autre tentative pour le loss (faire varier plus rapidement la covariance : on fait ouputs*100 )
-            
+                        
             if (phase == 'val') or (phase == 'test'):
                 outputs = outputs.detach()
                 inputs_init = inputs_init.detach()
                 targets_GT = targets_GT.detach()
                 print("loss AE")
-                print(loss_AE)
+                print(loss_AE_mu)
                 print("loss AE GT")
-                print(loss_AE_GT)
+                print(loss_AE_GT_mu)
                 print("loss All")
                 print(loss_All)
+                print("loss cov")
+                print(loss_AE_cov+loss_AE_GT_cov)
             
             # metrics
             mse = loss_I.detach()
             metrics   = dict([('mse',mse)])
             #print(mse.cpu().detach().numpy())
+            
             
             
             
