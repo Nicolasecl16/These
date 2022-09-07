@@ -55,7 +55,7 @@ def f_sum2(x) :
 
 
                 
-Database = f_sum(Database)  
+Database = f_sum2(Database)  
 
 dataTrainingNoNaND = Database[:int(0.6*N),:,:]
 dataValNoNaND = Database[int(0.6*N):int(0.8*N),:,:]
