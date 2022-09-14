@@ -95,7 +95,7 @@ print(dataTestNoNaND.shape )
 #flagTypeMissData = 0 : Missing data randomly chosen on the patch driven by rateMissingData
 #flagTypeMissData = 1 : Almost the same
 #flagTypeMissData = 2 : In each patch, different station are randomly chosen and are masked according to rateMissingData
-#flagTypeMissData = 3 : The stations listed in MaskedStations are masked, obs available every 4 time steps
+#flagTypeMissData = 3 : The stations listed in MaskedStations are masked, obs available every 4 days
 #flagTpeMissData = 4  : Prevision
 
 if flagTypeMissData == 0:

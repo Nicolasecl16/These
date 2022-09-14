@@ -336,7 +336,7 @@ x_test_Init = ( X_test_Init - meanTr ) / stdTr
 if flagInit==3:#full covariance
     
     from netCDF4 import Dataset
-    ncfile = Dataset('Res_Update/Experience_3/train_set.nc')
+    ncfile = Dataset('Results/Experiment3/train_set.nc')
     mu = ncfile['preds']
     prec = ncfile['p_diag']
     init   = ncfile['inits']
@@ -351,7 +351,7 @@ if flagInit==3:#full covariance
     mask_train         = masks[:,:,:]
     x_train            = target[:,:,:]
     
-    ncfile = Dataset('Res_Update/Experience_3/val_set.nc')
+    ncfile = Dataset('Results/Experiment3/val_set.nc')
     mu = ncfile['preds']
     prec = ncfile['p_diag']
     init   = ncfile['inits']
@@ -365,7 +365,7 @@ if flagInit==3:#full covariance
     mask_val           = masks
     x_val              = target
     
-    ncfile = Dataset('Res_Update/Experience_3/test_set.nc')
+    ncfile = Dataset('Results/Experiment3/test_set.nc')
     mu = ncfile['preds']
     prec = ncfile['p_diag']
     init   = ncfile['inits']
