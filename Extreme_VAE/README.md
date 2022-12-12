@@ -1,1 +1,8 @@
-About VAE extremes configuration : conda create -n tf tensorflow conda activate tensorflow conda install -c conda-forge tensorflow-probability
+About VAE extremes configuration : 
+Set up :
+conda install -c anaconda tensorflow-gpu tensorflow-probability=0.7.0
+
+required packages :
+ot
+seaborn
+statsmodels
