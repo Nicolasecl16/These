@@ -6,7 +6,7 @@ tfpl = tfp.layers
 tfd = tfp.distributions
 
 
-#Model with known prior
+#Model for radius generation with known prior
 class Encoder(tfk.Model):
     
     def __init__(self):      
@@ -84,7 +84,7 @@ class Ext_VAE(tfk.Model):
     def call(self,inputs):
         return self.decoder(self.encoder(inputs))
 
-# Model for bivariate distribution :
+# Model for radius generation with known prior and multimodal distribution :
 class Multi_Encoder(tfk.Model):
     
     def __init__(self):      
@@ -185,7 +185,7 @@ class Ext_Multi_VAE(tfk.Model):
     
     
     
-# Model with unknown prior
+# Model for radius generation with learned tail index of the prior
 class U_Encoder(tfk.Model):    
     def __init__(self):      
         super(U_Encoder,self).__init__()
@@ -267,91 +267,9 @@ class U_Ext_VAE(tfk.Model):
         return res
     
 
-# Model with unknown prior constant alpha for posterior
-class U_Encoder2(tfk.Model):    
-    def __init__(self):      
-        super(U_Encoder2,self).__init__()
-        self.alpha        = 1.5
-        self.alpha_post   = tf.Variable(tf.random.uniform([ndim], minval=2,maxval = 2.5, dtype=tf.float32), name='alpha_post')
-        self.prior        = self.make_mvn_prior(1,True)
-        self.dense1       = tfkl.Dense(5, activation ='relu',kernel_initializer =tfk.initializers.RandomUniform(minval=0.01, maxval=0.02))
-        self.dense2       = tfkl.Dense(5, activation ='relu',kernel_initializer =tfk.initializers.RandomUniform(minval=0.01, maxval=0.02))
-        self.dense3       = tfkl.Dense(1, activation='relu',bias_initializer = tfk.initializers.RandomUniform(minval=1, maxval=2))
-        self.lambda1      = tfkl.Lambda(lambda x: tf.abs(x)+0.001)
-        self.dist_lambda3 = tfpl.DistributionLambda(
-                            make_distribution_fn=lambda t: (tfd.Gamma(
-                                concentration=self.alpha_post, rate=t[...,0])),
-            activity_regularizer=tfpl.KLDivergenceRegularizer(self.prior, use_exact_kl=True)
-        )  
-        
-        #self.KL_Loss      = tfpl.KLDivergenceAddLoss()
-        
-    def make_mvn_prior(self,ndim, trainable):       
-        if trainable:
-            c = tf.Variable(tf.random.uniform([ndim], minval=2,maxval = 2.5, dtype=tf.float32), name='prior_c')
-            print(c)
-            rate = 1
-        else:
-            c = self.alpha
-            rate = 1
-        prior = (tfd.Gamma(concentration=c, rate=rate))
-        return prior
-    
-        
-    def call(self, inputs):
-        x = self.dense1(inputs)
-        x = self.dense2(x)
-        x = self.dense3(x)
-        x = self.dist_lambda3(x)
-        return(x)
-    
- 
- 
-class U_Decoder2(tfk.Model):
-    def __init__(self):
-        super(U_Decoder2,self).__init__()
-        
-        self.dense1  = tfkl.Dense(5, use_bias=True, activation='relu')
-        self.lambda1 = tfkl.Lambda(lambda x: 1/x)
-        self.dense2  = tfkl.Dense(5, use_bias=True, activation='relu')
-        self.dense31 = tfkl.Dense(1, use_bias=True)
-        self.dense32 = tfkl.Dense(1, use_bias=True)
-        self.lambda2 = tfkl.Lambda(lambda x: tf.abs(x)+0.001)
-        self.concat1 = tfkl.Concatenate()
-        self.dist_lambda1 = tfpl.DistributionLambda(
-            make_distribution_fn=lambda t: tfd.Gamma(
-                concentration=t[...,0], rate=t[...,1]))
-        
-        
-    def call(self, inputs):
-        y     = tfkl.Reshape(target_shape=[1])(inputs)
-        y     = self.lambda1(y)
-        x     = self.dense1(y)
-        x     = self.dense2(x)
-        alpha = self.dense31(x)
-        alpha = self.lambda1(alpha)
-        beta  = self.dense32(x)
-        beta  = self.lambda2(beta/y**2)
-        x     = self.concat1([alpha,beta])
-        x     = self.dist_lambda1(x)
-        return x
 
     
-class U_Ext_VAE2(tfk.Model):
-    def __init__(self):      
-        super(U_Ext_VAE2,self).__init__()
-        self.encoder = U_Encoder()
-        self.decoder = U_Decoder()
-        #self.Block   = tfpl.DistributionLambda(
-         #   make_distribution_fn=lambda d: tfd.Blockwise(
-        #        d))
-    
-    def call(self,inputs):
-        res =  self.decoder(self.encoder(inputs))
-        return res
-    
-# Standard VAE as competitor
-    
+# Standard VAE   
 class Std_Encoder(tfk.Model):
     
     def __init__(self):      
@@ -407,9 +325,7 @@ class Std_VAE(tfk.Model):
     
     
     
-#VAE for angular distribution
-#Encoder on the sphere independent from the radius
-
+#VAE for radius-conditioned angular distribution
 class Sphere_Encoder(tfk.Model):
     
     def __init__(self):      
