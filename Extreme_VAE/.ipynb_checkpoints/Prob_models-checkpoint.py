@@ -11,7 +11,8 @@ class Encoder(tfk.Model):
     
     def __init__(self):      
         super(Encoder,self).__init__()      
-        self.prior        = tfd.Gamma(concentration=1.5,rate = 1)
+        #self.prior        = tfd.Gamma(concentration=1.5,rate = 1)
+        self.prior        = tfd.Gamma(concentration=4.5,rate = 1)
         self.dense1       = tfkl.Dense(5, activation ='relu',kernel_initializer =tfk.initializers.Zeros())
         self.dense2       = tfkl.Dense(5, activation ='relu',kernel_initializer =tfk.initializers.Zeros())
         self.dense3       = tfkl.Dense(2, activation='relu',bias_initializer = tfk.initializers.RandomUniform(minval=1, maxval=2))
@@ -192,7 +193,7 @@ class U_Encoder(tfk.Model):
         self.prior        = self.make_mvn_prior(1,True)
         self.dense1       = tfkl.Dense(5, activation ='relu',kernel_initializer =tfk.initializers.RandomUniform(minval=0.01, maxval=0.02))
         self.dense2       = tfkl.Dense(5, activation ='relu',kernel_initializer =tfk.initializers.RandomUniform(minval=0.01, maxval=0.02))
-        self.dense3       = tfkl.Dense(2, activation='relu',bias_initializer = tfk.initializers.RandomUniform(minval=1, maxval=2))
+        self.dense3       = tfkl.Dense(2, activation='relu',bias_initializer = tfk.initializers.RandomUniform(minval=3., maxval=5.5))
         self.lambda1      = tfkl.Lambda(lambda x: tf.abs(x)+0.001)
         self.dist_lambda3 = tfpl.DistributionLambda(
                             make_distribution_fn=lambda t: (tfd.Gamma(
@@ -203,7 +204,7 @@ class U_Encoder(tfk.Model):
         
     def make_mvn_prior(self,ndim,Trainable=True):
         if Trainable:
-            c = tf.Variable(tf.random.uniform([ndim], minval=1,maxval = 2, dtype=tf.float32), name='prior_c')
+            c = tf.Variable(tf.random.uniform([ndim], minval=3.5,maxval = 5.5, dtype=tf.float32), name='prior_c')
             print(c)
             rate = 1
         else:
@@ -355,8 +356,8 @@ class Std_Encoder(tfk.Model):
     
     def __init__(self):      
         super(Std_Encoder,self).__init__()
-        self.encoded_size =1
-        self.prior        = tfd.Normal(loc=tf.zeros(self.encoded_size), scale=1)
+        self.encoded_size =4
+        self.prior        = tfd.MultivariateNormalDiag(loc=tf.zeros(self.encoded_size))
         self.dense1       = tfkl.Dense(5,activation='relu')
         self.dense2       = tfkl.Dense(5,activation='relu')
         self.lambda1      = tfkl.Lambda(lambda x: tf.abs(x)+0.001)
@@ -376,7 +377,7 @@ class Std_Encoder(tfk.Model):
 class Std_Decoder(tfk.Model):
     def __init__(self):
         super(Std_Decoder,self).__init__()
-        self.K         = 1
+        self.K         = 4
         self.dense1    = tfkl.Dense(5, use_bias=True, activation='relu')
         self.dense2    = tfkl.Dense(5, use_bias=True, activation='relu')
         self.dense3    = tfkl.Dense(tfpl.IndependentNormal(self.K).params_size(self.K))        
@@ -465,7 +466,7 @@ class Sphere_Decoder(tfk.Model):
         x               = self.ind_norm11(x)
         #dirichlet output 
         #x               = self.dense32(x)
-        # x = self.lambda12(x)
+        #x = self.lambda12(x)
         #x = self.diri12(x)
         return x
     
