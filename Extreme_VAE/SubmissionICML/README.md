@@ -7,8 +7,7 @@ Core implementation of the architecure
 - conda
 
 ### Instructions
-- Clone repo:
-`git clone https://github.com/Nicolasecl16/These/SubmissionICML.git
+- Clone repo: 'git clone https://github.com/Nicolasecl16/These/SubmissionICML.git
 
 ### Config 
 #### Set up :
