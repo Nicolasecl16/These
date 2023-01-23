@@ -10,7 +10,7 @@ Core implementation of the architecure
 - Clone repo: 
 'git clone https://github.com/Nicolasecl16/These/SubmissionICML.git'
 - Clone repo:
-`git clone https://github.com/CIA-Oceanix/4dvarnet-core.git`
+`git clone https://github.com/Nicolasecl16/These/SubmissionICML.git`
 ### Config 
 #### Set up :
 conda install -c anaconda tensorflow-gpu tensorflow-probability=0.7.0
