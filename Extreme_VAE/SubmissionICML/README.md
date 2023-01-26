@@ -3,16 +3,14 @@ Core implementation of the architecure
 
 ## Installation
 ### Prerequisite
-- git
 - conda
 
-### Instructions
-- Clone repo:
-`git clone https://github.com/Nicolasecl16/These/SubmissionICML.git`
 ### Config 
 #### Set up :
+If GPU available:
 conda install -c anaconda tensorflow-gpu tensorflow-probability=0.7.0
-
+Else :
+conda install -c anaconda tensorflow tensorflow-probability
 #### Required packages :
 ot
 seaborn
