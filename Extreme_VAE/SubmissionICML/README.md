@@ -7,9 +7,9 @@ Core implementation of the architecure
 
 ### Config 
 #### Set up :
-If GPU available:
-conda install -c anaconda tensorflow-gpu tensorflow-probability=0.7.0
-Else :
+If GPU available:  
+conda install -c anaconda tensorflow-gpu tensorflow-probability=0.7.0  
+Else:  
 conda install -c anaconda tensorflow tensorflow-probability
 #### Required packages :
 ot
