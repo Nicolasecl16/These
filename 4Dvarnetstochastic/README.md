@@ -9,5 +9,18 @@ conda activate 4dvarnetsto
 conda install pytorch torchvision torchaudio cudatoolkit=11.3 -c pytorch
 ```
 
-Other required packages:
+- Other required packages:
+```
 netcdf4
+pytorch-lightning=1.6.2
+```
+
+## Train a model
+In one of the folder Danube or Lorenz63
+From a terminal
+```
+python main.py --train
+```
+
+## Test pre-trained model
+In one of the folder Danube or Lorenz63, open Analysis.ipynb for detailed experiments.
